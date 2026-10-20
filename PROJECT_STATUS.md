@@ -1,0 +1,110 @@
+# BankPro — Project Status
+
+_Last updated: 2026-10-20_
+
+## Current phase
+**Phase 5 (Dashboard, targets, reports) — complete. Delivered to the PC on 2026-10-20.**
+Next: Phase 6 (UI polish) when asked.
+
+## Completed
+- [x] Phase 0 — environment inspected
+- [x] Phase 1 — `docs/ARCHITECTURE.md`, `DECISIONS.md`
+- [x] Phase 2 — backend + frontend skeleton, Flyway V1 schema (12 tables) + V2 reference data, docker-compose MySQL
+- [x] Phase 3 — authentication & authorization
+  - Backend: `POST /api/auth/login`, `GET /api/auth/me`, `GET /api/users` (team, scoped), `GET /api/branches` (scoped)
+  - JWT (HS256, 60 min) via Spring Security resource server; BCrypt(10) passwords
+  - Role checks (`@PreAuthorize`) + `DataScope` branch/ownership scoping in services
+  - Login rate limiting (5 failures / 15 min per email+IP → 429), generic login errors, audit log of logins
+  - Consistent JSON errors for 400/401/403/404/409/429/500, CORS allow-list, security headers
+  - 7 fictional demo users (`db/dev/R__dev_seed_users.sql`), password `BankPro@2026`
+  - Frontend: login page (validation, demo accounts), session restore, auto-logout on expiry/401,
+    protected routes, role guard, role-filtered sidebar (collapsible + mobile drawer), top bar,
+    notifications panel (empty state), user menu, dashboard welcome, team page, settings, 403/404 pages
+
+- [x] Phase 4a — customers & product catalogue
+  - Backend: `/api/products` (list/get; ADMIN create/update/deactivate), `/api/customers` (server-side search,
+    filters, sort whitelist, pagination; create; update with optimistic locking; archive/restore; CSV export),
+    `/api/users/assignable`
+  - Rules: branch-scoped reads, officers edit only their own customers, managers archive, ADMIN read-only for
+    customers; phone/email normalised before duplicate checks; CSV formula-injection protection; audit log entries
+  - 30 fictional demo customers + 23 product holdings (`db/dev/R__dev_seed_z1_customers.sql`)
+  - Frontend: Customers list (URL-synced filters, sortable table, pagination, CSV download), customer detail,
+    create/edit form, Banking Products catalogue + admin product form; shared Button, FormField, SearchBar,
+    SelectFilter, DataTable, Pagination, ConfirmDialog, Toasts
+
+- [x] Phase 4b — leads, conversion, follow-ups, notifications
+  - Backend: `/api/leads` (search, board, summary, create, update, PATCH status, PATCH assign, POST convert),
+    `/api/sales` (+ manager decision), `/api/follow-ups` (views, counts, create, complete, reschedule),
+    `/api/customers/{id}/timeline` + `/interactions`, `/api/notifications`, overdue-reminder job
+  - 30 demo leads, 11 simulated sales (completed / pending / declined), 14 follow-ups, interaction history
+    (`db/dev/R__dev_seed_z2_leads.sql`, `R__dev_seed_z3_followups.sql`)
+  - Frontend: Kanban board (drag & drop + keyboard "Move" menu), table view, pipeline summary, lead detail with
+    stage track, convert / lost / assign dialogs, manager approval queue, Follow-ups tabs + month calendar,
+    customer leads / follow-ups / timeline / log interaction, live notification bell
+
+- [x] Phase 5 — dashboard, sales targets, reports
+  - Backend: `/api/dashboard/*` (summary + 6 chart/table feeds), `/api/targets` (+ ranking; manager CRUD),
+    `/api/reports/{type}` + CSV export (7 report types); live SQL aggregations scoped by role (D-40..D-46)
+  - Demo targets for the current and previous month + quarterly branch targets (`R__dev_seed_z4_targets.sql`)
+  - Frontend: KPI tiles with definitions, period presets, admin branch filter, Recharts charts with
+    "Show data" tables, targets progress + ranking + manager create/edit/delete, generic reports page
+  - Details: `docs/PHASE5_NOTES.md`
+
+## Verified results
+| Check | Where | Result |
+|---|---|---|
+| Backend `mvn test` (Phase 2 code) | Developer PC (JDK 25, Docker 29, MySQL 8.4) | Passed (reported by developer) |
+| Backend `mvn test` (Phase 3 code) — 26 tests | Assistant sandbox (JDK 21, MySQL 8.0, offline with PC's Maven cache) | 26 / 26 passed |
+| App start + real HTTP login / 403 / Swagger | Assistant sandbox | Passed |
+| Frontend lint / tests / build | Assistant sandbox | 0 warnings · 24 / 24 passed · build OK |
+| Browser end-to-end (login, redirect, reload, sign-out, officer blocked from Team, mobile 390 px) | Assistant sandbox, Chromium | Passed after fixing 2 redirect bugs |
+| Backend `mvn test` (Phase 4a) — 59 tests | Assistant sandbox (MySQL 8.0) | 59 / 59 passed |
+| Frontend lint / tests / build (Phase 4a) | Assistant sandbox | 0 warnings · 35 / 35 passed · build OK |
+| Browser end-to-end (officer create/search/edit/duplicate/export, manager archive/restore/sort, admin product, mobile) | Assistant sandbox, Chromium | Passed |
+| Backend `mvn test` (Phase 4b) — 92 tests | Assistant sandbox (MySQL 8.0) | 92 / 92 passed (incl. 6-thread concurrent conversion) |
+| Frontend lint / tests / build (Phase 4b) | Assistant sandbox | 0 warnings · 49 / 49 passed · build OK |
+| Browser end-to-end (board menu + drag, illegal drag blocked, card conversion → approval, follow-up complete/schedule, calendar, timeline, reassignment notification, admin read-only, mobile) | Assistant sandbox, Chromium | Passed |
+| Phase 4b on the PC — 92 tests + app start | Developer PC (JDK 25, MySQL 8.4) | 92 / 92 passed, app started (developer log, 2026-10-20 20:08) |
+| Backend `mvn test` (Phase 5) — 105 tests | Assistant sandbox (MySQL 8.0) | 105 / 105 passed |
+| Frontend lint / tests / build (Phase 5) | Assistant sandbox | 0 warnings · 61 / 61 passed · build OK |
+| Browser end-to-end (officer / manager / admin dashboards, branch filter vs API, target create / duplicate / edit / delete, all 7 reports, CSV export, mobile 390 px) | Assistant sandbox, Chromium | Passed, no console errors |
+| Phase 5 backend on the PC — 105 tests + app start | Developer PC (JDK 25, MySQL 8.4) | 105 / 105 passed, target seed applied, app started (developer log, 2026-10-20 20:42) |
+| Phase 5 frontend on the PC (`npm test`, pages in browser) | Developer PC | **Pending** |
+| Backend `mvn test` + app run (Phase 3 + 4a) on the PC | Developer PC (JDK 25, Docker MySQL 8.4) | Passed — tests, login and Customers page confirmed by developer (2026-10-19 13:45) |
+| `mvn spring-boot:run` (Phase 3) on the PC | Developer PC, MySQL 8.4.11 (Docker) | Started on port 8080 — Flyway + Hibernate validation OK (2026-10-19 10:34) |
+| Login in the browser on the PC | Developer PC | Working (confirmed 2026-10-19) |
+
+### Backend tests (26)
+AuthIntegrationTest (8): login success incl. trimmed/mixed-case email, generic failure, inactive user, validation,
+rate limit 429, /me, missing/tampered/expired/foreign-issuer tokens, public endpoint + security headers ·
+AuthorizationIntegrationTest (5): admin sees all users, manager only own branch (both branches), officer 403,
+branch visibility, CORS allow/deny · BankProApplicationTests (3) · SystemControllerTest (1) ·
+PasswordHashingTest (2) · DataScopeTest (5) · LoginRateLimiterTest (2)
+
+## Environment (developer PC, Windows 11)
+Java 25.0.1 · Maven 3.9.11 · Node 22.17.0 · Git 2.48.1 · Docker 29.8.2 · MySQL via Docker only.
+npm needs `Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned` once.
+
+## Commands
+```powershell
+# repo root
+docker compose up -d
+# backend
+cd backend; mvn test; mvn spring-boot:run          # http://localhost:8080 (PORT in .env to change)
+# frontend
+cd frontend; npm install; npm run dev              # http://localhost:5173
+npm test; npm run lint; npm run build
+```
+
+## Pending
+- [ ] Run Phase 3 on the PC: `mvn test`, start app, sign in with a demo account
+- [ ] `git init` + first commits
+- [ ] Delete `C:\Users\Farhan\.m2\repository\_bankpro_tmp` and the project's `_to_delete` folder (assistant's temporary copies)
+- [ ] Phases 6–9 — UI polish, QA, deployment, portfolio
+
+## Known bugs / issues
+- Port 8080 was occupied on the PC (environment). Use `PORT=8081` in `.env` + `VITE_DEV_PROXY_TARGET` in
+  `frontend/.env.local` if it can't be freed.
+
+## Next step
+Restart the backend on the PC with the Phase 5 files, run `mvn test` (expect 105) and `npm test` (expect 61); then Phase 6 when asked.

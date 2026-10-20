@@ -1,0 +1,17 @@
+# Test profile: schema, reference data and the demo users (db/dev), so login tests use documented accounts.
+# The datasource is supplied by Testcontainers (@ServiceConnection), or by -Dspring.datasource.*
+# when running with -Dbankpro.test.local-db=true.
+spring:
+  flyway:
+    locations: classpath:db/migration,classpath:db/dev
+    clean-disabled: true
+
+app:
+  scheduling:
+    enabled: false        # tests call the overdue job directly
+  jwt:
+    # Fixed TEST-ONLY key (not used anywhere else) so tests can craft expired/tampered tokens.
+    secret: dGVzdC1vbmx5LWtleS1mb3ItYmFua3Byby1pbnRlZ3JhdGlvbi10ZXN0cy0xMjM0NTY=
+  login-rate-limit:
+    max-failures: 5
+    window: 15m

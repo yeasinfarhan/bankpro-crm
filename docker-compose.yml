@@ -1,0 +1,33 @@
+# Local development database. Usage (from the repo root):
+#   docker compose up -d        start MySQL in the background
+#   docker compose ps           check it is "healthy"
+#   docker compose down         stop (data is kept in the bankpro-mysql volume)
+# Values come from the .env file next to this one (copy .env.example to .env first).
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: bankpro-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-bankpro}
+      MYSQL_USER: ${MYSQL_USER:-bankpro}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:?Set MYSQL_PASSWORD in .env}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?Set MYSQL_ROOT_PASSWORD in .env}
+      TZ: UTC
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_0900_ai_ci
+      - --default-time-zone=+00:00
+    ports:
+      - "127.0.0.1:${DB_PORT:-3306}:3306"   # only reachable from this PC
+    volumes:
+      - bankpro-mysql:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -u root -p$$MYSQL_ROOT_PASSWORD --silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+volumes:
+  bankpro-mysql:
