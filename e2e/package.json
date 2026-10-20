@@ -1,0 +1,12 @@
+{
+  "name": "bankpro-e2e",
+  "private": true,
+  "description": "Browser end-to-end tests for BankPro (needs the backend and frontend running).",
+  "scripts": {
+    "test": "playwright test",
+    "report": "playwright show-report"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.56.1"
+  }
+}

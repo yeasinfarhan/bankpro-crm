@@ -3,8 +3,8 @@
 _Last updated: 2026-10-20_
 
 ## Current phase
-**Phase 6 (Professional UI) — complete. Delivered to the PC on 2026-10-20.**
-Next: Phase 7 (Quality assurance) when asked.
+**Phase 7 (Quality assurance) — complete. Delivered to the PC on 2026-10-20.**
+Next: Phase 8 (Deployment) when asked. Full results: `docs/QA_REPORT.md`.
 
 ## Completed
 - [x] Phase 0 — environment inspected
@@ -56,6 +56,11 @@ Next: Phase 7 (Quality assurance) when asked.
   - Accessibility: axe-core clean on all pages for all roles at desktop and phone width (D-49)
   - Consistent filter bars and input heights; Team page uses the shared table; unused placeholder page removed
   - Route-level code splitting: first download 504 kB → 295 kB (D-50)
+- [x] Phase 7 — quality assurance (`docs/QA_REPORT.md`)
+  - Access-control matrix test: 52 wrong-branch / wrong-owner / wrong-role / tampering checks (D-51)
+  - Browser E2E suite in `e2e/` (Playwright, 20 tests): full customer-to-sale workflow, access, forms, navigation, exports (D-52)
+  - Fixed: customer data in error logs (D-53), duplicate-target error logging, broken-pipe log noise,
+    keyboard support in the customer picker, ambiguous Approve/Decline button names
 
 ## Verified results
 | Check | Where | Result |
@@ -80,7 +85,12 @@ Next: Phase 7 (Quality assurance) when asked.
 | Frontend lint / tests / build (Phase 6) | Assistant sandbox | 0 warnings · 68 / 68 passed · build OK, no chunk-size warning |
 | Accessibility + layout audit (Phase 6): 16 pages × 3 roles × 2 widths | Assistant sandbox, Chromium + axe-core 4.10 | 0 violations · no horizontal overflow · no console errors |
 | Browser end-to-end (global search scope per role, keyboard, see-all, mobile overlay, mobile card sort) | Assistant sandbox, Chromium | Passed |
-| Phase 6 on the PC | **Files installed 2026-10-20; `npm test` pending** | — |
+| Phase 6 frontend on the PC (`npm test`) | Developer PC | 68 / 68 passed (reported by developer, 2026-10-20) |
+| Backend `mvn test` (Phase 7) — 158 tests | Assistant sandbox (MySQL 8.0) | 158 / 158 passed |
+| Frontend lint / tests / build (Phase 7) | Assistant sandbox | 0 warnings · 70 / 70 passed · build OK |
+| Browser E2E suite (`e2e/`, 20 tests) | Assistant sandbox, Chromium | 20 / 20 passed, 4 consecutive runs |
+| Accessibility audit re-run (96 page views) | Assistant sandbox, axe-core 4.10 | 0 violations |
+| Phase 7 on the PC | **Pending: `mvn test` (158), `npm test` (70), optional E2E (20)** | — |
 | Backend `mvn test` + app run (Phase 3 + 4a) on the PC | Developer PC (JDK 25, Docker MySQL 8.4) | Passed — tests, login and Customers page confirmed by developer (2026-10-19 13:45) |
 | `mvn spring-boot:run` (Phase 3) on the PC | Developer PC, MySQL 8.4.11 (Docker) | Started on port 8080 — Flyway + Hibernate validation OK (2026-10-19 10:34) |
 | Login in the browser on the PC | Developer PC | Working (confirmed 2026-10-19) |
@@ -105,6 +115,8 @@ cd backend; mvn test; mvn spring-boot:run          # http://localhost:8080 (PORT
 # frontend
 cd frontend; npm install; npm run dev              # http://localhost:5173
 npm test; npm run lint; npm run build
+# end-to-end (backend + frontend running)
+cd e2e; npm install; npx playwright install chromium; npm test
 ```
 
 ## Pending
@@ -118,4 +130,4 @@ _Git: first commit `a040c45` (Phases 0–5) pushed to GitHub `origin/main` on 20
   `frontend/.env.local` if it can't be freed.
 
 ## Next step
-On the PC run `npm test` (expect 68) and check the pages; commit Phase 6; then Phase 7 when asked.
+On the PC run `mvn test` (expect 158) and `npm test` (expect 70), optionally the E2E suite; commit Phase 7; then Phase 8 (deployment) when asked.

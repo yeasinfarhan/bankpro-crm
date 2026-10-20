@@ -166,6 +166,15 @@ class DashboardAndTargetsIntegrationTest extends IntegrationTest {
         // duplicate, invalid values, permissions
         mockMvc.perform(post("/api/targets").header(HttpHeaders.AUTHORIZATION, manager)
                 .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(body))).andExpect(status().isConflict());
+        // whole-branch targets (no officer) are de-duplicated too
+        Map<String, Object> branchTarget = new java.util.HashMap<>(Map.of("periodType", "MONTHLY", "periodStart", "2031-03-01",
+                "category", "NEW_CUSTOMERS", "targetValue", 10));
+        mockMvc.perform(post("/api/targets").header(HttpHeaders.AUTHORIZATION, manager)
+                .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(branchTarget))).andExpect(status().isCreated());
+        mockMvc.perform(post("/api/targets").header(HttpHeaders.AUTHORIZATION, manager)
+                        .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(branchTarget)))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.message").value("A new customers target for this person and period already exists. Edit it instead."));
         body.put("targetValue", 0);
         mockMvc.perform(post("/api/targets").header(HttpHeaders.AUTHORIZATION, manager)
                 .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(body))).andExpect(status().isBadRequest());

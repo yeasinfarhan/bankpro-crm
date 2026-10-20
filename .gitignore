@@ -30,3 +30,7 @@ frontend/playwright-report/
 # Temporary delivery folders (not part of the project)
 _incoming/
 _to_delete/
+
+# End-to-end test output
+e2e/test-results/
+e2e/playwright-report/

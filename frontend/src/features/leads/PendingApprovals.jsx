@@ -37,7 +37,7 @@ export default function PendingApprovals({ onDecided }) {
         <ClipboardCheck className="h-4 w-4 text-warning-600" aria-hidden="true" />
         Applications awaiting your simulated decision ({data.length})
       </h2>
-      <ul className="divide-y divide-line">
+      <ul className="divide-y divide-line" aria-label="Applications awaiting decision">
         {data.map((s) => (
           <li key={s.id} className="flex flex-col gap-2 px-4 py-3 text-sm sm:flex-row sm:items-center sm:justify-between">
             <div>
@@ -46,8 +46,10 @@ export default function PendingApprovals({ onDecided }) {
             </div>
             {s.canDecide && (
               <div className="flex gap-2">
-                <Button variant="secondary" loading={busy === s.id} onClick={() => decide(s, 'DECLINE')}>Decline</Button>
-                <Button loading={busy === s.id} onClick={() => decide(s, 'APPROVE')}>Approve</Button>
+                <Button variant="secondary" loading={busy === s.id} onClick={() => decide(s, 'DECLINE')}
+                  aria-label={`Decline ${s.customer.name}'s ${s.product.name} application`}>Decline</Button>
+                <Button loading={busy === s.id} onClick={() => decide(s, 'APPROVE')}
+                  aria-label={`Approve ${s.customer.name}'s ${s.product.name} application`}>Approve</Button>
               </div>
             )}
           </li>

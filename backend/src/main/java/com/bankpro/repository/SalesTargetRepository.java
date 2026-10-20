@@ -1,6 +1,8 @@
 package com.bankpro.repository;
 
+import com.bankpro.entity.PeriodType;
 import com.bankpro.entity.SalesTarget;
+import com.bankpro.entity.TargetCategory;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -30,4 +32,15 @@ public interface SalesTargetRepository extends JpaRepository<SalesTarget, Long> 
 
     @EntityGraph(attributePaths = {"branch", "user"})
     Optional<SalesTarget> findWithDetailsById(Long id);
+
+    /** Same owner (officer, or the whole branch when userId is null), period and category. */
+    @Query("""
+            SELECT COUNT(t) > 0 FROM SalesTarget t LEFT JOIN t.user u
+            WHERE t.branch.id = :branchId
+              AND ((:userId IS NULL AND u IS NULL) OR u.id = :userId)
+              AND t.periodType = :periodType AND t.periodStart = :periodStart AND t.category = :category
+            """)
+    boolean existsSame(@Param("branchId") Long branchId, @Param("userId") Long userId,
+                       @Param("periodType") PeriodType periodType, @Param("periodStart") LocalDate periodStart,
+                       @Param("category") TargetCategory category);
 }

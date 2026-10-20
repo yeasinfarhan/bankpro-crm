@@ -62,3 +62,9 @@ springdoc:
     enabled: false
   swagger-ui:
     enabled: false
+
+logging:
+  level:
+    # Hibernate logs the full database error text, which repeats the duplicated values (phone, email).
+    # GlobalExceptionHandler logs the constraint name instead, so customer data never reaches the logs.
+    org.hibernate.engine.jdbc.spi.SqlExceptionHelper: "OFF"

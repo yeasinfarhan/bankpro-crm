@@ -116,16 +116,26 @@ public class TargetService {
                     .filter(u -> u.getBranch() != null && Objects.equals(u.getBranch().getId(), caller.branchId()))
                     .orElseThrow(() -> new InvalidFieldException("userId", "Choose an active officer from your branch."));
         }
+        // Checked first so a normal duplicate is a clear 409, not a database error in the logs;
+        // the unique key still guarantees it if two requests race.
+        if (targets.existsSame(caller.branchId(), req.userId(), req.periodType(), start, req.category())) {
+            throw duplicate(req);
+        }
         SalesTarget target = new SalesTarget(branches.getReferenceById(caller.branchId()), user, req.periodType(),
                 start, end, req.category(), req.targetValue(), users.getReferenceById(caller.id()));
         try {
             targets.saveAndFlush(target);
         } catch (DataIntegrityViolationException e) {
-            throw new ConflictException("A " + req.category() + " target for this person and period already exists. Edit it instead.");
+            throw duplicate(req);
         }
         audit.record(caller.id(), "TARGET_CREATED", "TARGET", target.getId(),
                 Map.of("category", req.category().name(), "periodStart", start.toString(), "value", req.targetValue()), ip);
         return toResponse(caller, targets.findWithDetailsById(target.getId()).orElseThrow());
+    }
+
+    private static ConflictException duplicate(TargetRequest req) {
+        return new ConflictException("A " + req.category().name().toLowerCase().replace('_', ' ')
+                + " target for this person and period already exists. Edit it instead.");
     }
 
     /** Only the value can change; owner, category and period define the target's identity. */

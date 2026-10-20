@@ -14,12 +14,15 @@ import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.context.request.async.AsyncRequestNotUsableException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.time.Clock;
 import java.time.Instant;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Converts exceptions thrown anywhere in a controller or service into the {@link ApiError} JSON shape.
@@ -71,7 +74,8 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<ApiError> handleIntegrity(DataIntegrityViolationException ex, HttpServletRequest request) {
-        log.warn("Data integrity violation on {}: {}", request.getRequestURI(), ex.getMostSpecificCause().getMessage());
+        // Log only which constraint failed — the database message contains the duplicated values (e.g. a phone number).
+        log.warn("Data integrity violation on {}: constraint {}", request.getRequestURI(), constraintName(ex));
         return build(HttpStatus.CONFLICT, "The request conflicts with existing data.", request, List.of());
     }
 
@@ -85,11 +89,25 @@ public class GlobalExceptionHandler {
         return build(HttpStatus.NOT_FOUND, "Not found.", request, List.of());
     }
 
+    /** The browser went away (navigation, closed tab) before the response was written: nothing to send, not an error. */
+    @ExceptionHandler(AsyncRequestNotUsableException.class)
+    public void handleClientGone(AsyncRequestNotUsableException ex, HttpServletRequest request) {
+        log.debug("Client disconnected during {} {}", request.getMethod(), request.getRequestURI());
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiError> handleUnexpected(Exception ex, HttpServletRequest request) {
         log.error("Unexpected error on {} {}", request.getMethod(), request.getRequestURI(), ex);
         return build(HttpStatus.INTERNAL_SERVER_ERROR, "An unexpected error occurred.", request, List.of());
     }
+
+    static String constraintName(DataIntegrityViolationException ex) {
+        String message = String.valueOf(ex.getMostSpecificCause().getMessage());
+        Matcher m = CONSTRAINT.matcher(message);
+        return m.find() ? m.group(1) : ex.getMostSpecificCause().getClass().getSimpleName();
+    }
+
+    private static final Pattern CONSTRAINT = Pattern.compile("(?:for key|constraint) [`'\"]?([\\w.]+)");
 
     private ResponseEntity<ApiError> build(HttpStatus status, String message, HttpServletRequest request,
                                            List<ApiError.FieldError> fields) {

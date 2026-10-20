@@ -6,12 +6,13 @@ import { inputClass } from './FormField'
 
 /**
  * Search-as-you-type customer selector backed by the server-side customer search
- * (so it only ever offers customers the user is allowed to see).
+ * (so it only ever offers customers the user is allowed to see). ARIA combobox: arrow keys + Enter pick a customer.
  */
 export default function CustomerPicker({ id, value, onChange, invalid }) {
   const [q, setQ] = useState('')
   const [results, setResults] = useState([])
   const [open, setOpen] = useState(false)
+  const [active, setActive] = useState(-1)
   const term = useDebounce(q, 250)
 
   useEffect(() => {
@@ -40,6 +41,14 @@ export default function CustomerPicker({ id, value, onChange, invalid }) {
     )
   }
 
+  const showList = open && Boolean(term) && results.length > 0
+  const pick = (c) => {
+    onChange({ id: c.id, code: c.code, name: c.fullName })
+    setOpen(false)
+    setQ('')
+    setActive(-1)
+  }
+
   return (
     <div className="relative">
       <Search className="pointer-events-none absolute left-3 top-2.5 h-4 w-4 text-ink-muted" aria-hidden="true" />
@@ -47,28 +56,36 @@ export default function CustomerPicker({ id, value, onChange, invalid }) {
         id={id}
         type="search"
         role="combobox"
-        aria-expanded={open && results.length > 0}
+        aria-expanded={showList}
         aria-controls={`${id}-options`}
         aria-invalid={invalid ? 'true' : 'false'}
         autoComplete="off"
         placeholder="Search by name, phone or CUS-code"
         value={q}
+        aria-activedescendant={showList && active >= 0 ? `${id}-opt-${results[active].id}` : undefined}
         onChange={(e) => {
           setQ(e.target.value)
           setOpen(true)
+          setActive(-1)
           if (!e.target.value) setResults([])
+        }}
+        onKeyDown={(e) => {
+          if (!showList) return
+          if (e.key === 'ArrowDown') { e.preventDefault(); setActive((i) => Math.min(i + 1, results.length - 1)) }
+          else if (e.key === 'ArrowUp') { e.preventDefault(); setActive((i) => Math.max(i - 1, 0)) }
+          else if (e.key === 'Enter' && active >= 0) { e.preventDefault(); pick(results[active]) }
+          else if (e.key === 'Escape') { e.preventDefault(); setOpen(false) }
         }}
         className={`${inputClass} pl-9`}
       />
-      {open && term && results.length > 0 && (
-        <ul id={`${id}-options`} role="listbox" className="absolute z-20 mt-1 max-h-60 w-full overflow-y-auto rounded-lg border border-line bg-white py-1 shadow-lg">
-          {results.map((c) => (
-            <li key={c.id} role="option" aria-selected="false">
-              <button type="button" onClick={() => { onChange({ id: c.id, code: c.code, name: c.fullName }); setOpen(false); setQ('') }}
-                className="flex w-full items-center justify-between px-3 py-2 text-left text-sm hover:bg-royal-50">
-                <span className="font-medium text-ink">{c.fullName}</span>
-                <span className="text-xs text-ink-muted">{c.code}</span>
-              </button>
+      {showList && (
+        <ul id={`${id}-options`} role="listbox" aria-label="Matching customers" className="absolute z-20 mt-1 max-h-60 w-full overflow-y-auto rounded-lg border border-line bg-white py-1 shadow-lg">
+          {results.map((c, i) => (
+            <li key={c.id} id={`${id}-opt-${c.id}`} role="option" aria-selected={active === i}
+              onMouseDown={(e) => e.preventDefault()} onClick={() => pick(c)} onMouseEnter={() => setActive(i)}
+              className={`flex cursor-pointer items-center justify-between px-3 py-2 text-sm ${active === i ? 'bg-royal-50' : ''}`}>
+              <span className="font-medium text-ink">{c.fullName}</span>
+              <span className="text-xs text-ink-muted">{c.code}</span>
             </li>
           ))}
         </ul>

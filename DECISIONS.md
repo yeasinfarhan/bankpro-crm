@@ -209,3 +209,21 @@ scroll regions, and the lead board uses real list markup.
 ### D-50 — Route-level code splitting
 Signed-in pages are loaded with `React.lazy` behind one `<Suspense>` in the app shell. The first download
 fell from 504 kB to 295 kB (94 kB gzipped), and the chart library loads only on the dashboard and reports.
+
+### D-51 — An access-control matrix test instead of scattered checks
+`AccessControlMatrixIntegrationTest` lists every write endpoint and the sensitive reads, and tries each as
+another branch, a colleague and the wrong role, plus parameter tampering and missing/forged tokens. New
+endpoints should be added to the matrix. Out-of-scope records answer 404 (existence is not revealed);
+role violations answer 403.
+
+### D-52 — Browser E2E tests live in their own `e2e/` package
+Playwright is kept out of the frontend's dependencies so `npm install` for the app stays small and the
+app's unit tests stay fast. The suite runs against a running app (local or deployed via `E2E_BASE_URL`),
+one test at a time because the tests share a database.
+
+### D-53 — No customer data in logs
+Database constraint errors are logged by constraint name only, and Hibernate's SQL error logger is off,
+because MySQL's duplicate-key message contains the duplicated value (a phone number or email). Client
+disconnects are logged at debug level. Expected user mistakes (duplicates) are checked before saving so
+they are a clean 409, with the database constraint as the guard against races.
+
