@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { Suspense, useState } from 'react'
+import LoadingState from '../ui/LoadingState'
 import { Outlet } from 'react-router'
 import Sidebar from './Sidebar'
 import Topbar from './Topbar'
@@ -43,7 +44,10 @@ export default function AppShell() {
       <div className="flex min-w-0 flex-1 flex-col">
         <Topbar onOpenMobileNav={() => setMobileOpen(true)} />
         <main id="main" className="mx-auto w-full max-w-7xl flex-1 px-4 py-6 sm:px-6 lg:px-8">
-          <Outlet />
+          {/* Each page is loaded on first visit (code splitting), so the first download stays small. */}
+          <Suspense fallback={<LoadingState rows={6} label="Loading page…" />}>
+            <Outlet />
+          </Suspense>
         </main>
       </div>
     </div>

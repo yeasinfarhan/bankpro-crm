@@ -2,6 +2,7 @@ import { useState } from 'react'
 import Card from '../ui/Card'
 import LoadingState from '../ui/LoadingState'
 import ErrorState from '../ui/ErrorState'
+import ScrollRegion from '../ui/ScrollRegion'
 
 /**
  * Frame for every chart: title, one-line definition, loading / error / empty states and a
@@ -29,7 +30,7 @@ export default function ChartCard({ title, description, state, isEmpty, emptyTex
         {state.status === 'error' && <ErrorState message={state.error} onRetry={state.reload} />}
         {state.status === 'ok' && isEmpty && <p className="py-10 text-center text-sm text-ink-muted">{emptyText}</p>}
         {state.status === 'ok' && !isEmpty && (showTable && table ? (
-          <div className="overflow-x-auto">
+          <ScrollRegion label={`${title} data`}>
             <table className="min-w-full text-sm">
               <caption className="sr-only">{title}</caption>
               <thead><tr className="text-left text-xs text-ink-muted">{table.columns.map((c) => <th key={c.key} scope="col" className="px-2 py-1.5 font-medium">{c.label}</th>)}</tr></thead>
@@ -39,7 +40,7 @@ export default function ChartCard({ title, description, state, isEmpty, emptyTex
                 ))}
               </tbody>
             </table>
-          </div>
+          </ScrollRegion>
         ) : children)}
       </div>
     </Card>

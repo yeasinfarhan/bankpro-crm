@@ -95,7 +95,7 @@ export default function TargetsPage() {
       <div className="mb-5 flex flex-wrap items-end gap-3" role="group" aria-label="Target filters">
         <label className="flex flex-col gap-1 text-xs font-medium text-ink-muted">Month
           <input type="month" value={month} onChange={(e) => e.target.value && setParam('month', e.target.value)}
-            className="rounded-lg border border-line bg-white px-2.5 py-1.5 text-sm text-ink shadow-sm" />
+            className="rounded-lg border border-line bg-white px-2.5 py-[7px] text-sm text-ink shadow-sm focus:border-royal-500 focus:outline-none focus:ring-2 focus:ring-royal-100" />
         </label>
         {isAdmin && (
           <SelectFilter label="Branch" value={branchId} onChange={(v) => { const n = new URLSearchParams(params); n.delete('userId'); if (v) n.set('branchId', v); else n.delete('branchId'); setParams(n, { replace: true }) }}

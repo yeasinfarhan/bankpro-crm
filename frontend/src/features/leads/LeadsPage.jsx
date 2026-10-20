@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router'
 import { Columns3, Plus, Table2, Workflow } from 'lucide-react'
 import PageHeader from '../../components/ui/PageHeader'
@@ -18,7 +17,7 @@ import LeadDialogHost from './LeadDialogHost'
 import PendingApprovals from './PendingApprovals'
 import useLeadActions from './useLeadActions'
 import useApi from '../../hooks/useApi'
-import useDebounce from '../../hooks/useDebounce'
+import useSearchText from '../../hooks/useSearchText'
 import { fetchLeadBoard, fetchLeadSummary, fetchLeads } from '../../api/leadsApi'
 import { fetchProducts } from '../../api/productsApi'
 import { fetchAssignableStaff } from '../../api/usersApi'
@@ -27,12 +26,12 @@ import { formatBdt, formatDate } from '../../utils/format'
 import { useAuth } from '../auth/AuthContext'
 
 /** Pipeline page: summary figures, Kanban board or table, filters in the URL. */
+const DATE_INPUT = 'rounded-lg border border-line bg-white px-2.5 py-[7px] text-sm text-ink shadow-sm focus:border-royal-500 focus:outline-none focus:ring-2 focus:ring-royal-100'
+
 export default function LeadsPage() {
   const { user } = useAuth()
   const navigate = useNavigate()
   const [params, setParams] = useSearchParams()
-  const [q, setQ] = useState(params.get('q') ?? '')
-  const debouncedQ = useDebounce(q)
   const view = params.get('view') === 'table' ? 'table' : 'board'
   const isManager = user.role === 'BRANCH_MANAGER'
   const isOfficer = user.role === 'RELATIONSHIP_OFFICER'
@@ -46,10 +45,7 @@ export default function LeadsPage() {
     setParams(next, { replace: true })
   }
 
-  useEffect(() => {
-    if ((params.get('q') ?? '') !== debouncedQ) setParam('q', debouncedQ)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [debouncedQ])
+  const [q, setQ] = useSearchText(params, (text) => setParam('q', text))
 
   const filters = { q: get('q'), productId: get('productId'), officerId: get('officerId'), from: get('from'), to: get('to') }
   const tableParams = { ...filters, status: get('status'), sort: get('sort') || 'createdAt,desc', page: Number(get('page') || 0), size: 20 }
@@ -121,7 +117,7 @@ export default function LeadsPage() {
 
       {isManager && <PendingApprovals onDecided={refresh} />}
 
-      <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:items-end">
+      <Card className="mb-4 flex flex-col gap-3 p-4 xl:flex-row xl:items-end xl:justify-between">
         <SearchBar value={q} onChange={setQ} placeholder="Customer, product or LD-code" label="Search leads" />
         <div className="grid grid-cols-2 gap-3 sm:flex sm:flex-wrap sm:items-end">
           {view === 'table' && <SelectFilter label="Stage" value={get('status')} onChange={(v) => setParam('status', v)} options={options(LEAD_STATUSES)} />}
@@ -130,13 +126,13 @@ export default function LeadsPage() {
           {!isOfficer && <SelectFilter label="Officer" value={get('officerId')} onChange={(v) => setParam('officerId', v)}
             options={(staff.data ?? []).map((s) => ({ value: String(s.id), label: s.fullName }))} />}
           <label className="flex flex-col gap-1 text-xs font-medium text-ink-muted">Created from
-            <input type="date" value={get('from')} onChange={(e) => setParam('from', e.target.value)} className="rounded-lg border border-line bg-white px-2.5 py-1.5 text-sm text-ink" />
+            <input type="date" value={get('from')} max={get('to') || undefined} onChange={(e) => setParam('from', e.target.value)} className={DATE_INPUT} />
           </label>
-          <label className="flex flex-col gap-1 text-xs font-medium text-ink-muted">to
-            <input type="date" value={get('to')} onChange={(e) => setParam('to', e.target.value)} className="rounded-lg border border-line bg-white px-2.5 py-1.5 text-sm text-ink" />
+          <label className="flex flex-col gap-1 text-xs font-medium text-ink-muted">Created to
+            <input type="date" value={get('to')} min={get('from') || undefined} onChange={(e) => setParam('to', e.target.value)} className={DATE_INPUT} />
           </label>
         </div>
-      </div>
+      </Card>
 
       {data.status === 'loading' && <Card><LoadingState rows={6} label="Loading leads…" /></Card>}
       {data.status === 'error' && <Card><ErrorState message={data.error} onRetry={data.reload} /></Card>}

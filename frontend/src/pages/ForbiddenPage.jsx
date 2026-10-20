@@ -8,6 +8,7 @@ export default function ForbiddenPage() {
     <Card>
       <EmptyState
         icon={ShieldAlert}
+        headingLevel={1}
         title="You don't have access to this page"
         description="Your role does not include this area of BankPro. Contact your branch manager if you need access."
         action={<Link to="/" className="text-sm font-medium text-royal-600 hover:underline">Back to dashboard</Link>}

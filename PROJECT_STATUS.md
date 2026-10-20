@@ -3,8 +3,8 @@
 _Last updated: 2026-10-20_
 
 ## Current phase
-**Phase 5 (Dashboard, targets, reports) — complete. Delivered to the PC on 2026-10-20.**
-Next: Phase 6 (UI polish) when asked.
+**Phase 6 (Professional UI) — complete. Delivered to the PC on 2026-10-20.**
+Next: Phase 7 (Quality assurance) when asked.
 
 ## Completed
 - [x] Phase 0 — environment inspected
@@ -50,6 +50,13 @@ Next: Phase 6 (UI polish) when asked.
     "Show data" tables, targets progress + ranking + manager create/edit/delete, generic reports page
   - Details: `docs/PHASE5_NOTES.md`
 
+- [x] Phase 6 — professional UI
+  - Working global search (customers + leads, role-scoped, keyboard accessible, mobile overlay)
+  - Phone layout: 2-column KPI tiles, tables as labelled cards with "Sort by", logo + search in the mobile top bar
+  - Accessibility: axe-core clean on all pages for all roles at desktop and phone width (D-49)
+  - Consistent filter bars and input heights; Team page uses the shared table; unused placeholder page removed
+  - Route-level code splitting: first download 504 kB → 295 kB (D-50)
+
 ## Verified results
 | Check | Where | Result |
 |---|---|---|
@@ -69,7 +76,11 @@ Next: Phase 6 (UI polish) when asked.
 | Frontend lint / tests / build (Phase 5) | Assistant sandbox | 0 warnings · 61 / 61 passed · build OK |
 | Browser end-to-end (officer / manager / admin dashboards, branch filter vs API, target create / duplicate / edit / delete, all 7 reports, CSV export, mobile 390 px) | Assistant sandbox, Chromium | Passed, no console errors |
 | Phase 5 backend on the PC — 105 tests + app start | Developer PC (JDK 25, MySQL 8.4) | 105 / 105 passed, target seed applied, app started (developer log, 2026-10-20 20:42) |
-| Phase 5 frontend on the PC (`npm test`, pages in browser) | Developer PC | **Pending** |
+| Phase 5 frontend on the PC (`npm test`, pages in browser) | Developer PC | Confirmed by developer ("phase 5 done") |
+| Frontend lint / tests / build (Phase 6) | Assistant sandbox | 0 warnings · 68 / 68 passed · build OK, no chunk-size warning |
+| Accessibility + layout audit (Phase 6): 16 pages × 3 roles × 2 widths | Assistant sandbox, Chromium + axe-core 4.10 | 0 violations · no horizontal overflow · no console errors |
+| Browser end-to-end (global search scope per role, keyboard, see-all, mobile overlay, mobile card sort) | Assistant sandbox, Chromium | Passed |
+| Phase 6 on the PC | **Files installed 2026-10-20; `npm test` pending** | — |
 | Backend `mvn test` + app run (Phase 3 + 4a) on the PC | Developer PC (JDK 25, Docker MySQL 8.4) | Passed — tests, login and Customers page confirmed by developer (2026-10-19 13:45) |
 | `mvn spring-boot:run` (Phase 3) on the PC | Developer PC, MySQL 8.4.11 (Docker) | Started on port 8080 — Flyway + Hibernate validation OK (2026-10-19 10:34) |
 | Login in the browser on the PC | Developer PC | Working (confirmed 2026-10-19) |
@@ -107,4 +118,4 @@ _Git: first commit `a040c45` (Phases 0–5) pushed to GitHub `origin/main` on 20
   `frontend/.env.local` if it can't be freed.
 
 ## Next step
-Restart the backend on the PC with the Phase 5 files, run `mvn test` (expect 105) and `npm test` (expect 61); then Phase 6 when asked.
+On the PC run `npm test` (expect 68) and check the pages; commit Phase 6; then Phase 7 when asked.

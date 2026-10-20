@@ -8,6 +8,7 @@ import DateRangeFilter from '../../components/ui/DateRangeFilter'
 import LoadingState from '../../components/ui/LoadingState'
 import ErrorState from '../../components/ui/ErrorState'
 import Pagination from '../../components/ui/Pagination'
+import ScrollRegion from '../../components/ui/ScrollRegion'
 import ChartCard from '../../components/charts/ChartCard'
 import BarChartView from '../../components/charts/BarChartView'
 import { compactBdt, NEUTRAL } from '../../components/charts/chartTheme'
@@ -117,11 +118,11 @@ function ReportBody({ report: r, onPage }) {
         <p className="mt-1 text-sm text-ink-muted">{r.description}</p>
         <p className="mt-1 text-xs text-ink-muted">{formatDate(r.from)} – {formatDate(r.to)}</p>
         {r.summary.length > 0 && (
-          <dl className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <dl className="mt-4 grid grid-cols-2 gap-3 lg:grid-cols-4">
             {r.summary.map((m) => (
               <div key={m.label} className="rounded-lg bg-canvas px-4 py-3">
                 <dt className="text-xs font-medium text-ink-muted">{m.label}</dt>
-                <dd className="mt-1 text-lg font-semibold tabular-nums text-ink">{formatMetric(m.value, m.format)}</dd>
+                <dd className="mt-1 text-base font-semibold tabular-nums text-ink sm:text-lg">{formatMetric(m.value, m.format)}</dd>
               </div>
             ))}
           </dl>
@@ -146,7 +147,7 @@ function ReportBody({ report: r, onPage }) {
         {r.rows.length === 0 ? (
           <p className="py-12 text-center text-sm text-ink-muted">No records for this period and filter.</p>
         ) : (
-          <div className="overflow-x-auto">
+          <ScrollRegion label={`${r.title} table`}>
             <table className="min-w-full divide-y divide-line text-sm">
               <caption className="sr-only">{r.title}</caption>
               <thead className="bg-canvas text-left text-xs font-semibold uppercase tracking-wide text-ink-muted">
@@ -166,7 +167,7 @@ function ReportBody({ report: r, onPage }) {
                 ))}
               </tbody>
             </table>
-          </div>
+          </ScrollRegion>
         )}
         <Pagination page={r.page} totalPages={r.totalPages} totalElements={r.totalElements} size={r.size} onPageChange={onPage} />
       </Card>

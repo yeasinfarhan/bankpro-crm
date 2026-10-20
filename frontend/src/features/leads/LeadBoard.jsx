@@ -20,14 +20,13 @@ export default function LeadBoard({ board, onMove, busyId }) {
   }
 
   return (
-    <div className="flex gap-4 overflow-x-auto pb-4" role="list" aria-label="Lead pipeline">
+    <ul className="flex gap-4 overflow-x-auto pb-4" aria-label="Lead pipeline" tabIndex={0}>
       {PIPELINE.map((status) => {
         const column = board[status]
         const droppable = canDrop(status)
         return (
-          <section
+          <li
             key={status}
-            role="listitem"
             aria-label={`${LEAD_STATUSES[status]}: ${column.count} leads`}
             onDragOver={(e) => { if (droppable) { e.preventDefault(); setOver(status) } }}
             onDragLeave={() => setOver((s) => (s === status ? null : s))}
@@ -77,9 +76,9 @@ export default function LeadBoard({ board, onMove, busyId }) {
               )}
               {column.count === 0 && <li className="px-1 py-4 text-center text-xs text-ink-muted">No leads</li>}
             </ul>
-          </section>
+          </li>
         )
       })}
-    </div>
+    </ul>
   )
 }

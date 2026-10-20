@@ -78,7 +78,7 @@ export default function DashboardPage() {
       {summary.status === 'error' ? (
         <Card className="mb-5"><ErrorState message={summary.error} onRetry={summary.reload} /></Card>
       ) : (
-        <section aria-label="Key figures" className="mb-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <section aria-label="Key figures" className="mb-5 grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
           <KpiTile loading={!s} icon={Users} label="Total customers" value={s && num(s.totalCustomers)}
             definition="Non-archived customers in your scope right now." />
           <KpiTile loading={!s} icon={UserPlus} label="New this month" value={s && num(s.newCustomersThisMonth)}

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Users } from 'lucide-react'
 import PageHeader from '../../components/ui/PageHeader'
 import Card from '../../components/ui/Card'
+import DataTable from '../../components/tables/DataTable'
 import StatusBadge from '../../components/ui/StatusBadge'
 import LoadingState from '../../components/ui/LoadingState'
 import ErrorState from '../../components/ui/ErrorState'
@@ -13,6 +14,14 @@ import { formatDateTime } from '../../utils/format'
 import { useAuth } from '../auth/AuthContext'
 
 /** Team list. The backend decides who appears: all branches for ADMIN, own branch for managers. */
+const COLUMNS = [
+  { key: 'name', header: 'Name', render: (m) => (<><div className="font-medium text-ink">{m.fullName}</div><div className="text-xs text-ink-muted">{m.email}</div></>) },
+  { key: 'role', header: 'Role', render: (m) => (<><div>{ROLE_LABELS[m.role]}</div>{m.jobTitle && m.jobTitle !== ROLE_LABELS[m.role] && <div className="text-xs text-ink-muted">{m.jobTitle}</div>}</>) },
+  { key: 'branch', header: 'Branch', render: (m) => m.branch?.name ?? 'All branches' },
+  { key: 'status', header: 'Status', render: (m) => <StatusBadge tone={m.active ? 'success' : 'neutral'}>{m.active ? 'Active' : 'Inactive'}</StatusBadge> },
+  { key: 'lastLoginAt', header: 'Last sign-in (BST)', render: (m) => <span className="text-ink-muted">{formatDateTime(m.lastLoginAt)}</span> },
+]
+
 export default function TeamPage() {
   const { user } = useAuth()
   const [state, setState] = useState({ status: 'loading', rows: [], error: null })
@@ -48,38 +57,7 @@ export default function TeamPage() {
           <EmptyState icon={Users} title="No team members" description="No employees are assigned to this branch yet." />
         )}
         {state.status === 'ok' && state.rows.length > 0 && (
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-line text-sm">
-              <thead className="bg-canvas text-left text-xs font-semibold uppercase tracking-wide text-ink-muted">
-                <tr>
-                  <th scope="col" className="px-4 py-3">Name</th>
-                  <th scope="col" className="px-4 py-3">Role</th>
-                  <th scope="col" className="px-4 py-3">Branch</th>
-                  <th scope="col" className="px-4 py-3">Status</th>
-                  <th scope="col" className="px-4 py-3">Last sign-in (BST)</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-line">
-                {state.rows.map((m) => (
-                  <tr key={m.id} className="hover:bg-canvas/60">
-                    <td className="px-4 py-3">
-                      <div className="font-medium text-ink">{m.fullName}</div>
-                      <div className="text-xs text-ink-muted">{m.email}</div>
-                    </td>
-                    <td className="px-4 py-3">
-                      <div>{ROLE_LABELS[m.role]}</div>
-                      {m.jobTitle && <div className="text-xs text-ink-muted">{m.jobTitle}</div>}
-                    </td>
-                    <td className="px-4 py-3">{m.branch?.name ?? 'All branches'}</td>
-                    <td className="px-4 py-3">
-                      <StatusBadge tone={m.active ? 'success' : 'neutral'}>{m.active ? 'Active' : 'Inactive'}</StatusBadge>
-                    </td>
-                    <td className="px-4 py-3 text-ink-muted">{formatDateTime(m.lastLoginAt)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <DataTable columns={COLUMNS} rows={state.rows} caption="Team members" />
         )}
       </Card>
     </>

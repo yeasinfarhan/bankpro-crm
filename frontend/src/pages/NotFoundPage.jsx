@@ -8,6 +8,7 @@ export default function NotFoundPage() {
     <Card>
       <EmptyState
         icon={SearchX}
+        headingLevel={1}
         title="Page not found"
         description="The page you are looking for does not exist or has moved."
         action={<Link to="/" className="text-sm font-medium text-royal-600 hover:underline">Back to dashboard</Link>}

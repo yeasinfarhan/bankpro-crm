@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router'
 import { Download, Plus, Users } from 'lucide-react'
 import PageHeader from '../../components/ui/PageHeader'
@@ -13,7 +13,7 @@ import ErrorState from '../../components/ui/ErrorState'
 import EmptyState from '../../components/ui/EmptyState'
 import DataTable from '../../components/tables/DataTable'
 import useApi from '../../hooks/useApi'
-import useDebounce from '../../hooks/useDebounce'
+import useSearchText from '../../hooks/useSearchText'
 import { downloadCustomersCsv, fetchCustomers } from '../../api/customersApi'
 import { fetchAssignableStaff } from '../../api/usersApi'
 import { getErrorMessage } from '../../api/client'
@@ -34,9 +34,14 @@ export default function CustomersPage() {
   const navigate = useNavigate()
   const { notify } = useToast()
   const [params, setParams] = useSearchParams()
-  const [q, setQ] = useState(params.get('q') ?? '')
   const [exporting, setExporting] = useState(false)
-  const debouncedQ = useDebounce(q)
+  const [q, setQ] = useSearchText(params, (text) => {
+    const next = new URLSearchParams(params)
+    if (text) next.set('q', text)
+    else next.delete('q')
+    next.delete('page')
+    setParams(next, { replace: true })
+  })
 
   const filters = Object.fromEntries(FILTER_KEYS.map((k) => [k, params.get(k) ?? '']))
   const page = Number(filters.page || 0)
@@ -51,15 +56,6 @@ export default function CustomersPage() {
     setParams(next, { replace: true })
   }
 
-  // Push the debounced search text into the URL.
-  useEffect(() => {
-    if ((params.get('q') ?? '') === debouncedQ) return
-    const next = new URLSearchParams(params)
-    if (debouncedQ) next.set('q', debouncedQ)
-    else next.delete('q')
-    next.delete('page')
-    setParams(next, { replace: true })
-  }, [debouncedQ, params, setParams])
 
   const apiParams = {
     q: filters.q,

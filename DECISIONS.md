@@ -189,3 +189,23 @@ Recharts with one measure per chart (never two y-axes), a validated colour order
 "Lost", legends only for 2+ series, hover tooltips, and a "Show data" table on every dashboard chart so the
 numbers are readable without the graphic. Single numbers are KPI tiles, not charts. The dashboard and reports
 pages are lazy-loaded so the sign-in page does not download the chart library.
+
+### D-47 — Global search reuses the scoped list endpoints
+The top-bar search calls `GET /api/customers?q=` and `GET /api/leads?q=` (5 results each) instead of a new
+search API. It can therefore never show a record the user could not already open, and there is no second
+set of access rules to keep in sync. It is an ARIA combobox: arrow keys, Enter, Escape, `/` or Ctrl+K to focus.
+
+### D-48 — Tables become cards on phones
+Below 640 px `DataTable` renders each row as a labelled card with a "Sort by" select, instead of a table
+that must be scrolled sideways. The switch uses `matchMedia` (not CSS-only duplication), so there is one copy
+of the content in the page for screen readers and tests.
+
+### D-49 — Accessibility baseline: axe-core on every page
+Phase 6 checks every page as officer, manager and admin at 1440 px and 390 px with axe-core
+(WCAG 2 A/AA + best practice): 96 page views, 0 violations, no horizontal page overflow, no console errors.
+Fixes made: every page has one `<h1>` (incl. 403/404), wide tables and the lead board are keyboard-focusable
+scroll regions, and the lead board uses real list markup.
+
+### D-50 — Route-level code splitting
+Signed-in pages are loaded with `React.lazy` behind one `<Suspense>` in the app shell. The first download
+fell from 504 kB to 295 kB (94 kB gzipped), and the chart library loads only on the dashboard and reports.
