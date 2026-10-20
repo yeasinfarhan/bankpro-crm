@@ -97,8 +97,8 @@ npm test; npm run lint; npm run build
 ```
 
 ## Pending
-- [ ] Run Phase 3 on the PC: `mvn test`, start app, sign in with a demo account
-- [ ] `git init` + first commits
+_Git: first commit `a040c45` (Phases 0–5) pushed to GitHub `origin/main` on 2026-10-20._
+
 - [ ] Delete `C:\Users\Farhan\.m2\repository\_bankpro_tmp` and the project's `_to_delete` folder (assistant's temporary copies)
 - [ ] Phases 6–9 — UI polish, QA, deployment, portfolio
 
