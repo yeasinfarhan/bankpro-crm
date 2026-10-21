@@ -3,8 +3,8 @@
 _Last updated: 2026-10-21_
 
 ## Current phase
-**Phase 8 (Deployment) — prepared and rehearsed; hosting accounts and go-live pending (developer).**
-Guide: `docs/DEPLOYMENT.md`. Next after go-live: Phase 9 (portfolio polish) when asked.
+**Phase 8 (Deployment) — deployment-ready; the developer chose not to host it online (2026-10-21).**
+The production setup runs locally with `docker compose --profile app up -d --build` (verified). `docs/DEPLOYMENT.md` stays as the guide if hosting is wanted later. Next: Phase 9 (portfolio polish) when asked.
 
 ## Completed
 - [x] Phase 0 — environment inspected
@@ -62,11 +62,11 @@ Guide: `docs/DEPLOYMENT.md`. Next after go-live: Phase 9 (portfolio polish) when
   - Fixed: customer data in error logs (D-53), duplicate-target error logging, broken-pipe log noise,
     keyboard support in the customer picker, ambiguous Approve/Decline button names,
     lost first letter in list search boxes on slow machines
-- [~] Phase 8 — deployment (`docs/DEPLOYMENT.md`)
+- [x] Phase 8 — deployment-ready, not hosted by choice (`docs/DEPLOYMENT.md`)
   - Done: backend Dockerfile (512 MB-sized JVM), `prod` hardening, `demo` profile, `render.yaml` Blueprint,
     `frontend/vercel.json` (SPA routing, CSP and security headers), full-stack `docker compose --profile app`,
     sleeping-server notice on sign-in, read-only `npm run smoke` for the live site (D-54…D-57)
-  - Pending (developer): create Aiven / Render / Vercel accounts, deploy, set CORS, run `npm run smoke`
+  - Not hosted online (developer's decision); verified instead as a local production stack (smoke 6 / 6)
 
 ## Verified results
 | Check | Where | Result |
@@ -102,7 +102,7 @@ Guide: `docs/DEPLOYMENT.md`. Next after go-live: Phase 9 (portfolio polish) when
 | Frontend lint / tests / build (Phase 8) | Assistant sandbox | 0 warnings · 72 / 72 passed · build OK |
 | Production rehearsal: `prod,demo` profiles, TLS to MySQL with `sql_require_primary_key=ON` (as Aiven), 256 MB heap / 512 MB-sized JVM flags, URL-safe JWT secret, separate frontend origin with vercel.json CSP headers | Assistant sandbox | Fresh DB migrated + seeded; all 20 E2E + 6 smoke tests passed; 0 CSP violations; RSS ~367 MB; log clean |
 | Docker images + production stack (`docker compose --profile app`: prod,demo profiles, 512 MB limit, nginx) | Developer PC (Docker Desktop) | Both images built; `npm run smoke` 6 / 6 passed (2026-10-21) |
-| Live deployment (Aiven + Render + Vercel) | — | **Pending (developer)** |
+| Live deployment (Aiven + Render + Vercel) | — | Not done — developer chose not to host online |
 | Backend `mvn test` + app run (Phase 3 + 4a) on the PC | Developer PC (JDK 25, Docker MySQL 8.4) | Passed — tests, login and Customers page confirmed by developer (2026-10-19 13:45) |
 | `mvn spring-boot:run` (Phase 3) on the PC | Developer PC, MySQL 8.4.11 (Docker) | Started on port 8080 — Flyway + Hibernate validation OK (2026-10-19 10:34) |
 | Login in the browser on the PC | Developer PC | Working (confirmed 2026-10-19) |
@@ -142,4 +142,4 @@ _Git: first commit `a040c45` (Phases 0–5) pushed to GitHub `origin/main` on 20
   `frontend/.env.local` if it can't be freed.
 
 ## Next step
-Follow `docs/DEPLOYMENT.md` (optional step 0: `docker compose --profile app up -d --build`), then send the live addresses for verification.
+Commit and push Phase 8; then Phase 9 (portfolio polish) when asked.
