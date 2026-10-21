@@ -206,6 +206,6 @@ read-only smoke test for the live site. The same production configuration runs l
 
 ---
 
-Built by **[Yeasin Farhan]** ([LinkedIn][(https://www.linkedin.com/in/md-yeasin-569a8943a/?isSelfProfile=true)) · [GitHub](https://github.com/yeasinfarhan))
+Built by **[Yeasin Farhan]** ([LinkedIn](https://www.linkedin.com/in/md-yeasin-569a8943a/?isSelfProfile=true)) · [GitHub](https://github.com/yeasinfarhan))
 as a portfolio project for banking relationship officer roles, combining a CSE background with an understanding
 of branch sales work.
