@@ -95,8 +95,9 @@ test('follow-up: schedule for a customer, then complete it with an outcome', asy
   await page.getByRole('button', { name: 'Schedule follow-up' }).click()
   const dialog = page.getByRole('dialog')
   await dialog.getByLabel('Activity').selectOption({ label: 'Phone call' })
-  const soon = new Date(Date.now() + 2 * 3600_000 + 6 * 3600_000).toISOString().slice(0, 16) // two hours from now, BST
-  await dialog.getByLabel('Date and time (BST)').fill(soon)
+  // Tomorrow 10:00 Bangladesh time, so it is always in "Upcoming" whatever time the test runs
+  const tomorrowBst = new Date(Date.now() + 6 * 3600_000 + 24 * 3600_000).toISOString().slice(0, 10)
+  await dialog.getByLabel('Date and time (BST)').fill(`${tomorrowBst}T10:00`)
   await dialog.getByLabel('Notes').fill('E2E: confirm documents')
   await dialog.getByRole('button', { name: 'Schedule' }).click()
   await expect(dialog).toBeHidden()

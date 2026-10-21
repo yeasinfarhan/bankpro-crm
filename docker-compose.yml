@@ -1,8 +1,8 @@
-# Local development database. Usage (from the repo root):
-#   docker compose up -d        start MySQL in the background
-#   docker compose ps           check it is "healthy"
-#   docker compose down         stop (data is kept in the bankpro-mysql volume)
-# Values come from the .env file next to this one (copy .env.example to .env first).
+# Usage (from the repo root; values come from .env — copy .env.example to .env first):
+#   docker compose up -d                          MySQL only, for local development (backend/frontend run from your IDE)
+#   docker compose --profile app up -d --build    the whole app as it runs in production, on http://localhost:8081
+#   docker compose ps                             check status ("healthy")
+#   docker compose --profile app down             stop (data is kept in the bankpro-mysql volume)
 services:
   mysql:
     image: mysql:8.4
@@ -28,6 +28,34 @@ services:
       timeout: 5s
       retries: 10
       start_period: 30s
+
+  # --- Production-like stack (profile "app"): same images and settings as the hosted deployment ---
+  backend:
+    profiles: ["app"]
+    build: ./backend
+    container_name: bankpro-backend
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: prod,demo
+      DB_URL: jdbc:mysql://mysql:3306/${MYSQL_DATABASE:-bankpro}?serverTimezone=UTC&characterEncoding=utf8
+      DB_USERNAME: ${MYSQL_USER:-bankpro}
+      DB_PASSWORD: ${MYSQL_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET:-}   # required: 32+ characters in .env (the app refuses to start without it)
+      CORS_ALLOWED_ORIGINS: http://localhost:8081
+    mem_limit: 512m          # same memory as the free hosting plan, to catch problems early
+
+  frontend:
+    profiles: ["app"]
+    build: ./frontend
+    container_name: bankpro-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "127.0.0.1:8081:80"   # http://localhost:8081
 
 volumes:
   bankpro-mysql:

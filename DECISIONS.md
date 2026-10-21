@@ -227,3 +227,24 @@ because MySQL's duplicate-key message contains the duplicated value (a phone num
 disconnects are logged at debug level. Expected user mistakes (duplicates) are checked before saving so
 they are a clean 409, with the database constraint as the guard against races.
 
+### D-54 — Hosting: Aiven + Render + Vercel (all free, no card)
+Checked October 2026: Aiven's free MySQL (1 GB, no time limit), Render's free Docker web service (512 MB,
+sleeps after 15 min idle) and Vercel's Hobby plan need no credit card. Alternatives rejected for this demo:
+Koyeb (card pre-authorisation), Fly.io (no free plan for new accounts), Railway (only $1/month after the
+trial — not enough for a JVM), Cloud Run (billing account). `render.yaml` describes the backend as a Blueprint
+so the setup is repeatable.
+
+### D-55 — The browser calls the API directly (CORS), not through a Vercel proxy
+A proxy would time out while a sleeping backend starts (~1 minute). The frontend gets the API address at build
+time (`VITE_API_BASE_URL`); the backend allows exactly that origin. Sign-in, session restore and a wake-up
+check use a 90-second timeout, and the sign-in page tells visitors the server is starting.
+
+### D-56 — `demo` profile for the public demo data
+Production (`prod`) loads only the schema. Adding `demo` (`SPRING_PROFILES_ACTIVE=prod,demo`) also loads the
+fictional users and records so visitors can sign in. Real deployments must not use `demo`.
+
+### D-57 — Container sized for 512 MB
+Measured after a full end-to-end run: ~60 MB live heap, ~110 MB class metadata, ~45 MB compiled code,
+~370 MB resident in total. The image caps the heap at 50% of memory and bounds metaspace and code cache, so
+the process cannot exceed the limit; Hikari keeps 5 connections and recycles them before the database drops them.
+

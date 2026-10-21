@@ -39,14 +39,23 @@ All demo accounts use the password **`BankPro@2026`**.
 | Relationship Officer | imran.hossain@bankpro.demo | Gulshan |
 | *(inactive — login is refused)* | former.officer@bankpro.demo | Motijheel |
 
-These accounts exist only when the backend runs with the `dev` profile (the default locally).
+These accounts exist when the backend runs with the `dev` profile (the default locally) or the `demo` profile (the hosted demo).
 
 ## Tests
 
 ```powershell
 cd backend;  mvn test        # Docker Desktop must be running (Testcontainers MySQL 8.4)
 cd frontend; npm test; npm run lint; npm run build
+cd e2e;      npm install; npx playwright install chromium; npm test   # app must be running
 ```
+
+QA results: [docs/QA_REPORT.md](docs/QA_REPORT.md).
+
+## Deployment
+
+Free hosting: Aiven (MySQL) + Render (Spring Boot in Docker) + Vercel (React). Step-by-step guide:
+[docs/DEPLOYMENT.md](docs/DEPLOYMENT.md). To run the production setup locally:
+`docker compose --profile app up -d --build` → http://localhost:8081.
 
 API documentation (dev): http://localhost:8080/swagger-ui.html — sign in via `POST /api/auth/login`,
 then click **Authorize** and paste the `accessToken`.

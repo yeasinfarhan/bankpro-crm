@@ -53,7 +53,9 @@ export default function AuthProvider({ children }) {
         scheduleExpiry(saved.expiresAt)
         setState({ status: 'authenticated', user, notice: null, signedOut: false })
       },
-      () => active && logout('Your session has expired. Please sign in again.'),
+      (error) => active && logout(error?.response?.status === 401
+        ? 'Your session has expired. Please sign in again.'
+        : 'Could not reach the server to restore your session. Please sign in again.'),
     )
     return () => {
       active = false

@@ -43,16 +43,25 @@ public class JwtConfig {
             new SecureRandom().nextBytes(keyBytes);
             log.warn("JWT_SECRET not set: using a random key for this run (dev only). Tokens become invalid on restart.");
         } else {
-            try {
-                keyBytes = Base64.getDecoder().decode(jwt.secret().trim());
-            } catch (IllegalArgumentException e) {
-                throw new IllegalStateException("JWT_SECRET must be Base64-encoded (openssl rand -base64 48)", e);
-            }
+            keyBytes = decodeSecret(jwt.secret().trim());
         }
         if (keyBytes.length < MIN_KEY_BYTES) {
             throw new IllegalStateException("JWT_SECRET must decode to at least " + MIN_KEY_BYTES + " bytes");
         }
         return new SecretKeySpec(keyBytes, "HmacSHA256");
+    }
+
+    /** Accepts standard or URL-safe Base64 (hosting platforms generate either). */
+    static byte[] decodeSecret(String secret) {
+        try {
+            return Base64.getDecoder().decode(secret);
+        } catch (IllegalArgumentException standard) {
+            try {
+                return Base64.getUrlDecoder().decode(secret);
+            } catch (IllegalArgumentException urlSafe) {
+                throw new IllegalStateException("JWT_SECRET must be Base64-encoded (openssl rand -base64 48)", standard);
+            }
+        }
     }
 
     @Bean

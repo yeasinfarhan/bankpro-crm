@@ -8,6 +8,13 @@ import axios from 'axios'
  */
 const baseURL = import.meta.env.VITE_API_BASE_URL || '/api'
 
+/**
+ * Free hosting stops the backend when nobody uses it; the first request then waits while it starts
+ * (about a minute). Calls that can be the first of a visit (sign-in, session restore, the wake-up check)
+ * use this longer timeout.
+ */
+export const WAKE_UP_TIMEOUT_MS = 90_000
+
 export const apiClient = axios.create({
   baseURL,
   timeout: 15000,

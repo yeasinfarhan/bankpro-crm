@@ -1,9 +1,12 @@
-import { screen } from '@testing-library/react'
+import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { Route, Routes } from 'react-router'
-import { describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import LoginPage from './LoginPage'
 import { renderWithAuth, USERS } from '../../test/renderWithAuth'
+import { wakeServer } from '../../api/systemApi'
+
+vi.mock('../../api/systemApi', () => ({ wakeServer: vi.fn() }))
 
 function renderLogin(auth) {
   return renderWithAuth(
@@ -16,7 +19,26 @@ function renderLogin(auth) {
   )
 }
 
+beforeEach(() => {
+  vi.mocked(wakeServer).mockResolvedValue({ status: 'UP' })
+})
+
 describe('LoginPage', () => {
+  it('explains a slow first response (sleeping free-tier server) and clears it once the server answers', async () => {
+    let wake
+    vi.mocked(wakeServer).mockReturnValue(new Promise((resolve) => { wake = resolve }))
+    renderLogin({ login: vi.fn() })
+    expect(await screen.findByText(/Starting the demo server/, {}, { timeout: 4000 })).toBeInTheDocument()
+    wake({ status: 'UP' })
+    await waitFor(() => expect(screen.queryByText(/Starting the demo server/)).not.toBeInTheDocument())
+  })
+
+  it('says when the server cannot be reached at all', async () => {
+    vi.mocked(wakeServer).mockRejectedValue(new Error('Network Error'))
+    renderLogin({ login: vi.fn() })
+    expect(await screen.findByRole('alert')).toHaveTextContent('The server could not be reached')
+  })
+
   it('shows validation errors and does not call the API when fields are empty or invalid', async () => {
     const login = vi.fn()
     renderLogin({ login })

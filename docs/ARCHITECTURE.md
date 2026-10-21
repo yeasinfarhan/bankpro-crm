@@ -485,6 +485,8 @@ frontend/src/
 
 ## 9. Deployment target (Phase 8)
 
+Implemented as Aiven (MySQL) + Render (Docker) + Vercel — see `docs/DEPLOYMENT.md` and D-54…D-57.
+
 - Frontend → Vercel (`VITE_API_BASE_URL`)
 - Backend → Docker image on Render or Railway (free/hobby tiers)
 - Database → managed MySQL 8 (Railway MySQL or Aiven for MySQL)

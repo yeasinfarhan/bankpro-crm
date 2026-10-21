@@ -1,0 +1,26 @@
+# Render Blueprint for the BankPro API (https://render.com/docs/blueprint-spec).
+# Render → New → Blueprint → pick this repository. You will be asked for the values marked sync: false.
+services:
+  - type: web
+    name: bankpro-api
+    runtime: docker
+    plan: free
+    region: singapore          # can't be changed later; pick the region closest to your database
+    rootDir: backend
+    dockerfilePath: ./backend/Dockerfile   # relative to the repository root
+    dockerContext: ./backend
+    healthCheckPath: /actuator/health
+    autoDeploy: true
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod,demo        # "demo" loads the fictional demo users and records
+      - key: JWT_SECRET
+        generateValue: true     # Render creates a random base64 256-bit secret
+      - key: DB_URL
+        sync: false             # jdbc:mysql://HOST:PORT/defaultdb?sslMode=REQUIRED&serverTimezone=UTC&characterEncoding=utf8
+      - key: DB_USERNAME
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: CORS_ALLOWED_ORIGINS
+        sync: false             # your Vercel address, e.g. https://bankpro-crm.vercel.app (no trailing slash)

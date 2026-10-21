@@ -1,0 +1,6 @@
+# Public portfolio demo: SPRING_PROFILES_ACTIVE=prod,demo
+# Loads the same fictional users, customers, leads, follow-ups and targets as local development,
+# so visitors can sign in with the demo accounts shown on the login page. Never use with real data.
+spring:
+  flyway:
+    locations: classpath:db/migration,classpath:db/dev

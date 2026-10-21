@@ -16,7 +16,7 @@ export async function login(page, email) {
   await page.getByLabel('Email').fill(email)
   await page.getByLabel('Password', { exact: true }).fill(PASSWORD)
   await page.getByRole('button', { name: 'Sign in' }).click()
-  await expect(page.getByRole('heading', { level: 1, name: /Welcome/ })).toBeVisible()
+  await expect(page.getByRole('heading', { level: 1, name: /Welcome/ })).toBeVisible({ timeout: 120_000 })
 }
 
 export async function signOut(page) {

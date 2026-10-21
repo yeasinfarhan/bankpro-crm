@@ -7,6 +7,7 @@ import { useAuth } from './AuthContext'
 import { getErrorMessage, getFieldErrors } from '../../api/client'
 import { DEMO_ACCOUNTS, DEMO_PASSWORD } from './demoAccounts'
 import { safeRedirectFor } from '../../routes/navConfig'
+import useServerWake from './useServerWake'
 
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -17,6 +18,7 @@ export default function LoginPage() {
   const location = useLocation()
   const [serverError, setServerError] = useState(null)
   const [showPassword, setShowPassword] = useState(false)
+  const server = useServerWake()
 
   const {
     register,
@@ -73,6 +75,18 @@ export default function LoginPage() {
           <h1 className="mt-6 text-xl font-semibold text-ink lg:mt-0">Sign in to BankPro</h1>
           <p className="mt-1 text-sm text-ink-muted">Use your employee email and password.</p>
 
+          {server === 'waking' && (
+            <div role="status" className="mt-5 flex items-start gap-2 rounded-lg bg-warning-50 p-3 text-sm text-warning-600">
+              <Loader2 className="mt-0.5 h-4 w-4 shrink-0 animate-spin" aria-hidden="true" />
+              <span>Starting the demo server… Free hosting puts it to sleep when nobody is using it, so the first visit can take up to a minute. You can sign in now — it will wait.</span>
+            </div>
+          )}
+          {server === 'unreachable' && !serverError && (
+            <div role="alert" className="mt-5 flex items-start gap-2 rounded-lg bg-danger-50 p-3 text-sm text-danger-600">
+              <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
+              The server could not be reached. Check your connection and reload the page.
+            </div>
+          )}
           {notice && !serverError && (
             <div role="status" className="mt-5 flex items-start gap-2 rounded-lg bg-royal-50 p-3 text-sm text-royal-700">
               <Info className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
