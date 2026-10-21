@@ -7,7 +7,7 @@ Date: 2026-10-20 · Scope: everything built in Phases 1–6 · Data: synthetic d
 | Check | Result |
 |---|---|
 | Backend tests (`mvn test`) — JUnit 5, MockMvc, real MySQL | **158 / 158 passed** |
-| Frontend tests (`npm test`) — Vitest + React Testing Library | **70 / 70 passed** (23 files) |
+| Frontend tests (`npm test`) — Vitest + React Testing Library | **70 / 70 passed** (23 files), also 15 / 15 runs under heavy CPU load |
 | Frontend lint (`npm run lint`, oxlint) | **0 warnings, 0 errors** |
 | Frontend production build (`npm run build`) | **OK** — first download 295 kB (94 kB gzipped), no chunk warnings |
 | Browser end-to-end tests (`e2e/`, Playwright, Chromium) | **20 / 20 passed**, 4 consecutive full runs, no flaky tests |
@@ -75,6 +75,7 @@ API: 97/97 refused.
 | 3 | Leaving a page while it was loading logged "Unexpected error … Broken pipe" with a stack trace. | Low (log noise) | Client-disconnect exceptions are logged at debug level, no response attempted. | Backend log clean after 4 E2E runs |
 | 4 | Customer picker (lead and follow-up forms) could not be operated with arrow keys; options were buttons inside `role="option"`. | Medium (accessibility) | Real ARIA combobox: arrow keys, Enter, Escape, `aria-activedescendant`. | `CustomerPicker.test` |
 | 5 | Approval queue buttons were all named just "Approve"/"Decline" for screen readers. | Low (accessibility) | Each button names the customer and product, e.g. "Approve Jahangir Alam's BankPro Personal Loan application". | E2E `workflow.spec` uses the names |
+| 6 | On a slow machine, the first letter typed into the Customers/Leads search box could disappear ("Sohel" became "ohel"). Found when `npm test` failed once on the developer PC; reproduced by running the suite under heavy load (2 of 4 runs failed). Cause: the page treated its own, slightly delayed URL update as a change from elsewhere and reset the box. | Medium (usability) | `useSearchText` now ignores URL changes that it made itself. | `useSearchText.test` — 15 / 15 runs pass under the same load |
 
 No defect was found in authorization, branch isolation, calculations or CSV safety.
 

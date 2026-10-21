@@ -1,9 +1,9 @@
 # BankPro — Project Status
 
-_Last updated: 2026-10-20_
+_Last updated: 2026-10-21_
 
 ## Current phase
-**Phase 7 (Quality assurance) — complete. Delivered to the PC on 2026-10-20.**
+**Phase 7 (Quality assurance) — complete and verified on the PC (2026-10-21).**
 Next: Phase 8 (Deployment) when asked. Full results: `docs/QA_REPORT.md`.
 
 ## Completed
@@ -60,7 +60,8 @@ Next: Phase 8 (Deployment) when asked. Full results: `docs/QA_REPORT.md`.
   - Access-control matrix test: 52 wrong-branch / wrong-owner / wrong-role / tampering checks (D-51)
   - Browser E2E suite in `e2e/` (Playwright, 20 tests): full customer-to-sale workflow, access, forms, navigation, exports (D-52)
   - Fixed: customer data in error logs (D-53), duplicate-target error logging, broken-pipe log noise,
-    keyboard support in the customer picker, ambiguous Approve/Decline button names
+    keyboard support in the customer picker, ambiguous Approve/Decline button names,
+    lost first letter in list search boxes on slow machines
 
 ## Verified results
 | Check | Where | Result |
@@ -90,7 +91,8 @@ Next: Phase 8 (Deployment) when asked. Full results: `docs/QA_REPORT.md`.
 | Frontend lint / tests / build (Phase 7) | Assistant sandbox | 0 warnings · 70 / 70 passed · build OK |
 | Browser E2E suite (`e2e/`, 20 tests) | Assistant sandbox, Chromium | 20 / 20 passed, 4 consecutive runs |
 | Accessibility audit re-run (96 page views) | Assistant sandbox, axe-core 4.10 | 0 violations |
-| Phase 7 on the PC | **Pending: `mvn test` (158), `npm test` (70), optional E2E (20)** | — |
+| Phase 7 backend on the PC — `mvn test` | Developer PC (JDK 25, MySQL 8.4) | 158 / 158 passed (reported by developer, 2026-10-20) |
+| Phase 7 frontend on the PC — `npm test` | Developer PC | 70 / 70 passed after the search-box fix (reported by developer, 2026-10-21) |
 | Backend `mvn test` + app run (Phase 3 + 4a) on the PC | Developer PC (JDK 25, Docker MySQL 8.4) | Passed — tests, login and Customers page confirmed by developer (2026-10-19 13:45) |
 | `mvn spring-boot:run` (Phase 3) on the PC | Developer PC, MySQL 8.4.11 (Docker) | Started on port 8080 — Flyway + Hibernate validation OK (2026-10-19 10:34) |
 | Login in the browser on the PC | Developer PC | Working (confirmed 2026-10-19) |
@@ -130,4 +132,4 @@ _Git: first commit `a040c45` (Phases 0–5) pushed to GitHub `origin/main` on 20
   `frontend/.env.local` if it can't be freed.
 
 ## Next step
-On the PC run `mvn test` (expect 158) and `npm test` (expect 70), optionally the E2E suite; commit Phase 7; then Phase 8 (deployment) when asked.
+Commit and push Phase 7; then Phase 8 (deployment) when asked.
