@@ -14,7 +14,9 @@ test.describe('@smoke deployed app', () => {
     const health = await request.get(`${API}/actuator/health`, { timeout: 120_000 })
     expect(health.status()).toBe(200)
     expect(await health.json()).toEqual({ status: 'UP' })
-    expect((await request.get(`${API}/swagger-ui.html`)).status()).toBe(404)
+    // Swagger is switched off in production (a static host may answer with the app's page instead of 404)
+    const swagger = await request.get(`${API}/swagger-ui.html`)
+    expect(await swagger.text()).not.toContain('swagger-ui')
     expect((await request.get(`${API}/api/customers`)).status()).toBe(401)
   })
 

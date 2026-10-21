@@ -101,6 +101,6 @@ npm run lint
 npm run build
 # end-to-end (directory: e2e; backend + frontend must be running)   → expect 20 passed
 npm install
-npx playwright install chromium
+npm run install-browser
 npm test
 ```

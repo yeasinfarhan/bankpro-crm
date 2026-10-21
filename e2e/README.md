@@ -9,9 +9,12 @@ The tests add a few clearly labelled "E2E …" demo records each run; they never
 ```
 cd e2e
 npm install
-npx playwright install chromium      (first time only — downloads the test browser)
+npm run install-browser     (first time only — downloads the test browser)
 npm test
 ```
 
 `npm run report` opens an HTML report; failed tests keep a screenshot and a trace in `test-results/`.
 Set `E2E_BASE_URL` (frontend) and `E2E_API_URL` (backend, default http://localhost:8080) to test other addresses.
+
+The npm scripts call Node directly (not `npx`/`.bin` shims) because the shims break when the folder path
+contains `&`, as in `Customer & Sales CRM` (same fix as the frontend, D-28).

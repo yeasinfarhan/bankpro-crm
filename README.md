@@ -46,7 +46,7 @@ These accounts exist when the backend runs with the `dev` profile (the default l
 ```powershell
 cd backend;  mvn test        # Docker Desktop must be running (Testcontainers MySQL 8.4)
 cd frontend; npm test; npm run lint; npm run build
-cd e2e;      npm install; npx playwright install chromium; npm test   # app must be running
+cd e2e;      npm install; npm run install-browser; npm test   # app must be running
 ```
 
 QA results: [docs/QA_REPORT.md](docs/QA_REPORT.md).

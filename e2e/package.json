@@ -3,9 +3,10 @@
   "private": true,
   "description": "Browser end-to-end tests for BankPro (needs the backend and frontend running).",
   "scripts": {
-    "test": "playwright test",
-    "smoke": "playwright test --grep @smoke",
-    "report": "playwright show-report"
+    "test": "node node_modules/@playwright/test/cli.js test",
+    "smoke": "node node_modules/@playwright/test/cli.js test --grep @smoke",
+    "report": "node node_modules/@playwright/test/cli.js show-report",
+    "install-browser": "node node_modules/@playwright/test/cli.js install chromium"
   },
   "devDependencies": {
     "@playwright/test": "1.56.1"

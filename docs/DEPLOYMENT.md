@@ -95,7 +95,7 @@ Automated read-only check (creates no data), in cmd:
 ```
 cd e2e
 npm install
-npx playwright install chromium
+npm run install-browser
 set E2E_BASE_URL=https://bankpro-crm.vercel.app
 set E2E_API_URL=https://bankpro-api.onrender.com
 npm run smoke

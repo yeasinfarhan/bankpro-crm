@@ -101,7 +101,7 @@ Guide: `docs/DEPLOYMENT.md`. Next after go-live: Phase 9 (portfolio polish) when
 | Backend `mvn test` (Phase 8) — 159 tests | Assistant sandbox (MySQL 8.0) | 159 / 159 passed |
 | Frontend lint / tests / build (Phase 8) | Assistant sandbox | 0 warnings · 72 / 72 passed · build OK |
 | Production rehearsal: `prod,demo` profiles, TLS to MySQL with `sql_require_primary_key=ON` (as Aiven), 256 MB heap / 512 MB-sized JVM flags, URL-safe JWT secret, separate frontend origin with vercel.json CSP headers | Assistant sandbox | Fresh DB migrated + seeded; all 20 E2E + 6 smoke tests passed; 0 CSP violations; RSS ~367 MB; log clean |
-| Docker images (`docker compose --profile app`, Render build) | Not built in the sandbox (Docker Hub and Maven Central are blocked there) | **Pending: first build on the PC or on Render** |
+| Docker images + production stack (`docker compose --profile app`: prod,demo profiles, 512 MB limit, nginx) | Developer PC (Docker Desktop) | Both images built; `npm run smoke` 6 / 6 passed (2026-10-21) |
 | Live deployment (Aiven + Render + Vercel) | — | **Pending (developer)** |
 | Backend `mvn test` + app run (Phase 3 + 4a) on the PC | Developer PC (JDK 25, Docker MySQL 8.4) | Passed — tests, login and Customers page confirmed by developer (2026-10-19 13:45) |
 | `mvn spring-boot:run` (Phase 3) on the PC | Developer PC, MySQL 8.4.11 (Docker) | Started on port 8080 — Flyway + Hibernate validation OK (2026-10-19 10:34) |
@@ -128,7 +128,7 @@ cd backend; mvn test; mvn spring-boot:run          # http://localhost:8080 (PORT
 cd frontend; npm install; npm run dev              # http://localhost:5173
 npm test; npm run lint; npm run build
 # end-to-end (backend + frontend running)
-cd e2e; npm install; npx playwright install chromium; npm test
+cd e2e; npm install; npm run install-browser; npm test
 ```
 
 ## Pending
