@@ -3,8 +3,8 @@
 _Last updated: 2026-10-21_
 
 ## Current phase
-**Phase 8 (Deployment) — deployment-ready; the developer chose not to host it online (2026-10-21).**
-The production setup runs locally with `docker compose --profile app up -d --build` (verified). `docs/DEPLOYMENT.md` stays as the guide if hosting is wanted later. Next: Phase 9 (portfolio polish) when asked.
+**Phase 9 (Portfolio polish) — complete (2026-10-21). All phases 0–9 done.**
+Deployment-ready but not hosted online (developer's choice); runs with `docker compose --profile app up -d --build`.
 
 ## Completed
 - [x] Phase 0 — environment inspected
@@ -67,6 +67,10 @@ The production setup runs locally with `docker compose --profile app up -d --bui
     `frontend/vercel.json` (SPA routing, CSP and security headers), full-stack `docker compose --profile app`,
     sleeping-server notice on sign-in, read-only `npm run smoke` for the live site (D-54…D-57)
   - Not hosted online (developer's decision); verified instead as a local production stack (smoke 6 / 6)
+- [x] Phase 9 — portfolio polish
+  - Complete README (problem, features by role, screenshots, demo GIF, Mermaid architecture, one-command Docker run, tests, security, limitations)
+  - `docs/screenshots/` (15 screenshots + demo GIF + social preview), `docs/DEMO_SCRIPT.md`, `docs/INTERVIEW_GUIDE.md`, `docs/GITHUB_ABOUT.md`
+  - Fixed: Target-achievement card said "No targets set" while still loading
 
 ## Verified results
 | Check | Where | Result |
@@ -101,6 +105,7 @@ The production setup runs locally with `docker compose --profile app up -d --bui
 | Backend `mvn test` (Phase 8) — 159 tests | Assistant sandbox (MySQL 8.0) | 159 / 159 passed |
 | Frontend lint / tests / build (Phase 8) | Assistant sandbox | 0 warnings · 72 / 72 passed · build OK |
 | Production rehearsal: `prod,demo` profiles, TLS to MySQL with `sql_require_primary_key=ON` (as Aiven), 256 MB heap / 512 MB-sized JVM flags, URL-safe JWT secret, separate frontend origin with vercel.json CSP headers | Assistant sandbox | Fresh DB migrated + seeded; all 20 E2E + 6 smoke tests passed; 0 CSP violations; RSS ~367 MB; log clean |
+| Frontend lint / tests / build (Phase 9) | Assistant sandbox | 0 warnings · 72 / 72 passed · build OK |
 | Docker images + production stack (`docker compose --profile app`: prod,demo profiles, 512 MB limit, nginx) | Developer PC (Docker Desktop) | Both images built; `npm run smoke` 6 / 6 passed (2026-10-21) |
 | Live deployment (Aiven + Render + Vercel) | — | Not done — developer chose not to host online |
 | Backend `mvn test` + app run (Phase 3 + 4a) on the PC | Developer PC (JDK 25, Docker MySQL 8.4) | Passed — tests, login and Customers page confirmed by developer (2026-10-19 13:45) |
@@ -135,11 +140,11 @@ cd e2e; npm install; npm run install-browser; npm test
 _Git: first commit `a040c45` (Phases 0–5) pushed to GitHub `origin/main` on 2026-10-20._
 
 - [ ] Delete `C:\Users\Farhan\.m2\repository\_bankpro_tmp` and the project's `_to_delete` folder (assistant's temporary copies)
-- [ ] Phases 6–9 — UI polish, QA, deployment, portfolio
+- [ ] Optional: host online with `docs/DEPLOYMENT.md`
+- [ ] Optional next features: user-management screens, audit-log viewer, password reset, product recommendations
 
 ## Known bugs / issues
-- Port 8080 was occupied on the PC (environment). Use `PORT=8081` in `.env` + `VITE_DEV_PROXY_TARGET` in
-  `frontend/.env.local` if it can't be freed.
+- None open. (Environment note: if port 8080 is busy, set `PORT` in `.env` and `VITE_DEV_PROXY_TARGET` in `frontend/.env.local`.)
 
 ## Next step
-Commit and push Phase 8; then Phase 9 (portfolio polish) when asked.
+Commit and push Phase 9; update GitHub's About panel from `docs/GITHUB_ABOUT.md`; replace `[Your Name]` and the profile links at the end of README.md.

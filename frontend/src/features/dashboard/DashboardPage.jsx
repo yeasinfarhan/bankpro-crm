@@ -92,7 +92,8 @@ export default function DashboardPage() {
           <KpiTile loading={!s} icon={Landmark} label="Deposit sales" value={s && formatBdt(s.depositSalesValue)}
             definition="Deposit-product part of completed sales (sales volume, not balances)." />
           <KpiTile loading={!s} icon={Target} label="Target achievement" value={s && formatPercent(s.targetAchievementPct)}
-            definition={s?.targetsCounted ? `Average of ${s.targetsCounted} target${s.targetsCounted === 1 ? '' : 's'} overlapping the period.` : 'No targets set for this period.'} />
+            definition={!s ? 'Average achievement of the targets overlapping the period.'
+              : s.targetsCounted ? `Average of ${s.targetsCounted} target${s.targetsCounted === 1 ? '' : 's'} overlapping the period.` : 'No targets set for this period.'} />
           <KpiTile loading={!s} icon={AlarmClock} label="Overdue follow-ups" value={s && num(s.overdueFollowUps)}
             tone={s?.overdueFollowUps > 0 ? 'warning' : 'default'} definition="Scheduled activities whose due time has passed." />
         </section>
